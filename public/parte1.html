@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catálogo - Parte 1</title>
+  <title>Catálogo 1</title>
   <script src="archivos1.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -37,7 +37,7 @@
       font-size: 16px;
     }
 
-    .topbar button, .topbar a {
+    .topbar a {
       padding: 10px 14px;
       font-size: 14px;
       border: none;
@@ -47,9 +47,6 @@
       border-radius: 8px;
       cursor: pointer;
       display: inline-block;
-    }
-
-    .topbar a {
       text-align: center;
     }
 
@@ -138,7 +135,8 @@
       z-index: 1000;
     }
 
-    .acciones button, .acciones a {
+    .acciones button,
+    .acciones a {
       flex: 1;
       min-width: 140px;
       padding: 12px;
@@ -152,14 +150,60 @@
       color: white;
     }
 
-    .acciones .secundario {
-      background: #666;
+    .acciones .danger {
+      background: #b00020;
+    }
+
+    .acciones .loading {
+      background: #444;
+      cursor: wait;
     }
 
     .vacio {
       text-align: center;
       padding: 30px 15px;
       color: #777;
+    }
+
+    .datos-pedido {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .datos-pedido input,
+    .datos-pedido select {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .resumen {
+      width: 100%;
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .resumen strong {
+      display: inline-block;
+      min-width: 120px;
+    }
+
+    .envio {
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .alerta-minimo {
+      margin-top: 6px;
+      color: #b00020;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -168,8 +212,9 @@
   <header>
     <div class="topbar">
       <input type="text" id="busqueda" placeholder="Buscar modelo..." />
-      <a href="parte2.html">Ir a parte 2</a>
-      <a href="parte3.html">Ir a parte 3</a>
+      <a href="index.html">Inicio</a>
+      <a href="parte2.html">Catálogo 2</a>
+      <a href="parte3.html">Catálogo 3</a>
     </div>
     <div class="info" id="info"></div>
   </header>
@@ -180,13 +225,92 @@
   </main>
 
   <div class="acciones">
-    <button class="secundario" onclick="verPedido()">Ver pedido</button>
-    <button onclick="enviarPedido()">Enviar pedido</button>
+    <div class="datos-pedido">
+      <input id="cliente" placeholder="Nombre del cliente" />
+      <input id="localidad" placeholder="Localidad" />
+      <input id="telefono" placeholder="Teléfono" />
+
+      <select id="material">
+        <option value="">Seleccionar material</option>
+        <option value="Blanco">Blanco</option>
+        <option value="Tornasolado">Tornasolado / Holográfico</option>
+      </select>
+
+      <select id="medida">
+        <option value="">Seleccionar medida</option>
+        <option value="6cm">6 cm</option>
+        <option value="8cm">8 cm</option>
+        <option value="10cm">10 cm</option>
+      </select>
+    </div>
+
+    <div class="resumen" id="resumenPrecio">
+      <div><strong>Total de calcos:</strong> 0</div>
+      <div><strong>Precio por unidad:</strong> -</div>
+      <div><strong>Precio total:</strong> -</div>
+      <div class="envio">Envío a sucursal de Correo Argentino GRATIS</div>
+      <div class="alerta-minimo" id="alertaMinimo"></div>
+    </div>
+
+    <button class="danger" onclick="limpiarPedido()">Limpiar pedido</button>
+    <button id="btnEnviar" onclick="enviarPedido()">Enviar pedido</button>
   </div>
 
   <script>
     const CLOUDINARY_BASE = "https://res.cloudinary.com/da2c6wb9n/image/upload/";
     const STORAGE_KEY = "pedido_catalogo";
+    const OLD_KEYS = ["pedido_catalogo", "pedido", "carrito", "pedido_calcos"];
+
+    const PRECIOS = {
+      Blanco: {
+        "10cm": [
+          { min: 50, max: 79, precio: 458 },
+          { min: 80, max: 129, precio: 378 },
+          { min: 130, max: 249, precio: 342 },
+          { min: 250, max: 449, precio: 257 },
+          { min: 450, max: 649, precio: 219 },
+          { min: 650, max: Infinity, precio: 197 }
+        ],
+        "8cm": [
+          { min: 50, max: 79, precio: 412 },
+          { min: 80, max: 129, precio: 340 },
+          { min: 130, max: 249, precio: 308 },
+          { min: 250, max: 449, precio: 230 },
+          { min: 450, max: 649, precio: 197 },
+          { min: 650, max: Infinity, precio: 177 }
+        ],
+        "6cm": [
+          { min: 130, max: 249, precio: 246 },
+          { min: 250, max: 449, precio: 185 },
+          { min: 450, max: 649, precio: 158 },
+          { min: 650, max: Infinity, precio: 142 }
+        ]
+      },
+      Tornasolado: {
+        "10cm": [
+          { min: 50, max: 79, precio: 755 },
+          { min: 80, max: 129, precio: 623 },
+          { min: 130, max: 249, precio: 563 },
+          { min: 250, max: 449, precio: 423 },
+          { min: 450, max: 649, precio: 362 },
+          { min: 650, max: Infinity, precio: 325 }
+        ],
+        "8cm": [
+          { min: 50, max: 79, precio: 680 },
+          { min: 80, max: 129, precio: 561 },
+          { min: 130, max: 249, precio: 506 },
+          { min: 250, max: 449, precio: 384 },
+          { min: 450, max: 649, precio: 325 },
+          { min: 650, max: Infinity, precio: 292 }
+        ],
+        "6cm": [
+          { min: 130, max: 249, precio: 406 },
+          { min: 250, max: 449, precio: 307 },
+          { min: 450, max: 649, precio: 260 },
+          { min: 650, max: Infinity, precio: 234 }
+        ]
+      }
+    };
 
     function nombre(archivo) {
       return archivo.split("_")[0];
@@ -197,15 +321,54 @@
     }
 
     function cargarPedido() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-      } catch {
-        return {};
+      for (const key of OLD_KEYS) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data && typeof data === "object") {
+            return data;
+          }
+        } catch {}
       }
+      return {};
     }
 
-    function guardarPedido(pedido) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(pedido));
+    function guardarPedido(pedidoActual) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(pedidoActual));
+    }
+
+    function formatoPesos(valor) {
+      return "$" + valor.toLocaleString("es-AR");
+    }
+
+    function obtenerTotalCantidad() {
+      return Object.values(pedido).reduce((acc, val) => acc + (Number(val) || 0), 0);
+    }
+
+    function obtenerMinimoActual(medida) {
+      if (medida === "6cm") return 130;
+      return 50;
+    }
+
+    function obtenerPrecioUnitario(material, medida, cantidad) {
+      if (!material || !medida || !cantidad) return null;
+
+      const tablaMaterial = PRECIOS[material];
+      if (!tablaMaterial) return null;
+
+      const tablaMedida = tablaMaterial[medida];
+      if (!tablaMedida) return null;
+
+      const tramo = tablaMedida.find(item => cantidad >= item.min && cantidad <= item.max);
+      return tramo ? tramo.precio : null;
+    }
+
+    function obtenerItemsPedido() {
+      return Object.keys(pedido)
+        .filter(modelo => Number(pedido[modelo]) > 0)
+        .map(modelo => ({
+          modelo,
+          cantidad: Number(pedido[modelo]) || 0
+        }));
     }
 
     let pedido = cargarPedido();
@@ -213,9 +376,46 @@
 
     function actualizarInfo() {
       const totalModelos = Object.keys(pedido).filter(k => Number(pedido[k]) > 0).length;
-      const totalCantidad = Object.values(pedido).reduce((acc, val) => acc + (Number(val) || 0), 0);
+      const totalCantidad = obtenerTotalCantidad();
+
       document.getElementById("info").textContent =
-        `Mostrando ${archivosFiltrados.length} modelos · ${totalModelos} modelos cargados · ${totalCantidad} unidades`;
+        `Mostrando ${archivosFiltrados.length} modelos · ${totalModelos} modelos elegidos · ${totalCantidad} calcos`;
+    }
+
+    function actualizarResumenPrecio() {
+      const material = document.getElementById("material").value;
+      const medida = document.getElementById("medida").value;
+      const totalCantidad = obtenerTotalCantidad();
+      const minimo = obtenerMinimoActual(medida);
+      const precioUnitario = obtenerPrecioUnitario(material, medida, totalCantidad);
+
+      const resumen = document.getElementById("resumenPrecio");
+
+      let precioUnitarioTexto = "-";
+      let precioTotalTexto = "-";
+
+      if (precioUnitario && totalCantidad > 0) {
+        precioUnitarioTexto = formatoPesos(precioUnitario);
+        precioTotalTexto = formatoPesos(precioUnitario * totalCantidad);
+      }
+
+      resumen.innerHTML = `
+        <div><strong>Total de calcos:</strong> ${totalCantidad}</div>
+        <div><strong>Precio por unidad:</strong> ${precioUnitarioTexto}</div>
+        <div><strong>Precio total:</strong> ${precioTotalTexto}</div>
+        <div class="envio">Envío a sucursal de Correo Argentino GRATIS</div>
+        <div class="alerta-minimo" id="alertaMinimo"></div>
+      `;
+
+      const alertaNueva = document.getElementById("alertaMinimo");
+
+      if (!medida) {
+        alertaNueva.textContent = "";
+      } else if (totalCantidad > 0 && totalCantidad < minimo) {
+        alertaNueva.textContent = `Mínimo para ${medida}: ${minimo} calcos.`;
+      } else {
+        alertaNueva.textContent = "";
+      }
     }
 
     function cambiarCantidad(modelo, valor) {
@@ -229,6 +429,7 @@
 
       guardarPedido(pedido);
       actualizarInfo();
+      actualizarResumenPrecio();
     }
 
     function sumar(modelo, input) {
@@ -246,11 +447,13 @@
     function render() {
       const grid = document.getElementById("grid");
       const vacio = document.getElementById("vacio");
+
       grid.innerHTML = "";
 
       if (!archivosFiltrados.length) {
         vacio.style.display = "block";
         actualizarInfo();
+        actualizarResumenPrecio();
         return;
       }
 
@@ -288,6 +491,62 @@
       });
 
       actualizarInfo();
+      actualizarResumenPrecio();
+    }
+
+    function refrescarPedidoDesdeStorage() {
+      pedido = cargarPedido();
+
+      const texto = document.getElementById("busqueda").value.trim().toLowerCase();
+      archivosFiltrados = ARCHIVOS.filter(a => nombre(a).toLowerCase().includes(texto));
+
+      render();
+    }
+
+    function limpiarPedido() {
+      const confirmar = confirm("¿Querés borrar todo el pedido?");
+      if (!confirmar) return;
+
+      for (const key of OLD_KEYS) {
+        localStorage.removeItem(key);
+      }
+
+      pedido = {};
+      render();
+      alert("El pedido fue limpiado.");
+    }
+
+    function limpiarFormularioYCarrito() {
+      for (const key of OLD_KEYS) {
+        localStorage.removeItem(key);
+      }
+
+      pedido = {};
+
+      document.getElementById("cliente").value = "";
+      document.getElementById("localidad").value = "";
+      document.getElementById("telefono").value = "";
+      document.getElementById("material").value = "";
+      document.getElementById("medida").value = "";
+
+      archivosFiltrados = [...ARCHIVOS];
+      document.getElementById("busqueda").value = "";
+
+      render();
+    }
+
+    function setEstadoBotonEnviando(enviando) {
+      const btn = document.getElementById("btnEnviar");
+
+      if (enviando) {
+        btn.disabled = true;
+        btn.classList.add("loading");
+        btn.textContent = "Guardando pedido...";
+      } else {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        btn.textContent = "Enviar pedido";
+      }
     }
 
     document.getElementById("busqueda").addEventListener("input", function() {
@@ -296,41 +555,107 @@
       render();
     });
 
-    function generarCSV() {
-      const lineas = ["modelo,cantidad"];
+    document.getElementById("material").addEventListener("change", actualizarResumenPrecio);
+    document.getElementById("medida").addEventListener("change", actualizarResumenPrecio);
 
-      Object.keys(pedido)
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
-        .forEach(modelo => {
-          const cantidad = Number(pedido[modelo]) || 0;
-          if (cantidad > 0) {
-            lineas.push(`${modelo},${cantidad}`);
-          }
-        });
+    async function enviarPedido() {
+      const cliente = document.getElementById("cliente").value.trim();
+      const localidad = document.getElementById("localidad").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const material = document.getElementById("material").value;
+      const medida = document.getElementById("medida").value;
 
-      return lineas.join("\n");
-    }
+      const items = obtenerItemsPedido();
+      const totalCantidad = obtenerTotalCantidad();
+      const minimo = obtenerMinimoActual(medida);
+      const precioUnitario = obtenerPrecioUnitario(material, medida, totalCantidad);
+      const precioTotal = precioUnitario ? precioUnitario * totalCantidad : 0;
 
-    function verPedido() {
-      const csv = generarCSV();
-      alert(csv);
-    }
-
-    function enviarPedido() {
-      const items = Object.keys(pedido).filter(m => Number(pedido[m]) > 0);
+      let errores = [];
 
       if (!items.length) {
-        alert("Todavía no agregaste ningún modelo.");
+        errores.push("Agregá al menos un modelo al pedido.");
+      }
+
+      if (!cliente) {
+        errores.push("Ingresá tu nombre.");
+      }
+
+      if (!localidad) {
+        errores.push("Ingresá tu localidad.");
+      }
+
+      if (!telefono) {
+        errores.push("Ingresá tu teléfono.");
+      }
+
+      if (!material) {
+        errores.push("Seleccioná un material.");
+      }
+
+      if (!medida) {
+        errores.push("Seleccioná una medida.");
+      }
+
+      if (medida && totalCantidad > 0 && totalCantidad < minimo) {
+        errores.push(`El mínimo para ${medida} es de ${minimo} calcos.`);
+      }
+
+      if (material && medida && totalCantidad >= minimo && !precioUnitario) {
+        errores.push("No se pudo calcular el precio del pedido.");
+      }
+
+      if (errores.length > 0) {
+        alert(errores.join("\n"));
         return;
       }
 
-      const totalCantidad = items.reduce((acc, modelo) => acc + (Number(pedido[modelo]) || 0), 0);
+      const materialTexto = material === "Tornasolado" ? "Tornasolado / Holográfico" : material;
 
-      const mensaje = `Hola, te envío mi pedido de ${totalCantidad} calcos.`;
-      const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, "_blank");
+      try {
+        setEstadoBotonEnviando(true);
+
+        const response = await fetch("/api/pedidos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            cliente,
+            localidad,
+            telefono,
+            material: materialTexto,
+            medida,
+            totalCantidad,
+            precioUnitario,
+            precioTotal,
+            items
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "No se pudo guardar el pedido.");
+        }
+
+        alert(`Pedido guardado correctamente. Tu código es ${data.codigo}.`);
+
+        limpiarFormularioYCarrito();
+
+        const url = `https://wa.me/?text=${encodeURIComponent(data.whatsappMessage)}`;
+        window.open(url, "_blank");
+      } catch (error) {
+        alert(error.message || "Ocurrió un error al guardar el pedido.");
+      } finally {
+        setEstadoBotonEnviando(false);
+      }
     }
 
+    window.addEventListener("pageshow", refrescarPedidoDesdeStorage);
+    window.addEventListener("storage", refrescarPedidoDesdeStorage);
+
+    pedido = cargarPedido();
     render();
   </script>
 </body>
