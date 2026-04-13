@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo - Parte 1</title>
+  <script src="archivos1.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: white;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .topbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .topbar input {
+      flex: 1;
+      min-width: 180px;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    .topbar button, .topbar a {
+      padding: 10px 14px;
+      font-size: 14px;
+      border: none;
+      background: #111;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+    }
+
+    .topbar a {
+      text-align: center;
+    }
+
+    .info {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #444;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+      padding: 12px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+      padding-bottom: 10px;
+    }
+
+    .imgwrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .imgwrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: white;
+    }
+
+    .modelo {
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      margin: 8px 0 6px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .controls button {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      background: #111;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .controls input {
+      width: 55px;
+      height: 32px;
+      text-align: center;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .acciones {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      z-index: 1000;
+    }
+
+    .acciones button, .acciones a {
+      flex: 1;
+      min-width: 140px;
+      padding: 12px;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      background: #111;
+      color: white;
+    }
+
+    .acciones .secundario {
+      background: #666;
+    }
+
+    .vacio {
+      text-align: center;
+      padding: 30px 15px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="topbar">
+      <input type="text" id="busqueda" placeholder="Buscar modelo..." />
+      <a href="parte2.html">Ir a parte 2</a>
+      <a href="parte3.html">Ir a parte 3</a>
+    </div>
+    <div class="info" id="info"></div>
+  </header>
+
+  <main>
+    <div class="grid" id="grid"></div>
+    <div class="vacio" id="vacio" style="display:none;">No se encontraron modelos.</div>
+  </main>
+
+  <div class="acciones">
+    <button class="secundario" onclick="verPedido()">Ver pedido</button>
+    <button onclick="enviarPedido()">Enviar pedido</button>
+  </div>
+
+  <script>
+    const CLOUDINARY_BASE = "https://res.cloudinary.com/da2c6wb9n/image/upload/";
+    const STORAGE_KEY = "pedido_catalogo";
+
+    function nombre(archivo) {
+      return archivo.split("_")[0];
+    }
+
+    function urlImagen(archivo) {
+      return CLOUDINARY_BASE + archivo;
+    }
+
+    function cargarPedido() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function guardarPedido(pedido) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(pedido));
+    }
+
+    let pedido = cargarPedido();
+    let archivosFiltrados = [...ARCHIVOS];
+
+    function actualizarInfo() {
+      const totalModelos = Object.keys(pedido).filter(k => Number(pedido[k]) > 0).length;
+      const totalCantidad = Object.values(pedido).reduce((acc, val) => acc + (Number(val) || 0), 0);
+      document.getElementById("info").textContent =
+        `Mostrando ${archivosFiltrados.length} modelos · ${totalModelos} modelos cargados · ${totalCantidad} unidades`;
+    }
+
+    function cambiarCantidad(modelo, valor) {
+      valor = Number(valor) || 0;
+
+      if (valor <= 0) {
+        delete pedido[modelo];
+      } else {
+        pedido[modelo] = valor;
+      }
+
+      guardarPedido(pedido);
+      actualizarInfo();
+    }
+
+    function sumar(modelo, input) {
+      input.value = Number(input.value || 0) + 1;
+      cambiarCantidad(modelo, input.value);
+    }
+
+    function restar(modelo, input) {
+      let actual = Number(input.value || 0);
+      actual = Math.max(0, actual - 1);
+      input.value = actual;
+      cambiarCantidad(modelo, actual);
+    }
+
+    function render() {
+      const grid = document.getElementById("grid");
+      const vacio = document.getElementById("vacio");
+      grid.innerHTML = "";
+
+      if (!archivosFiltrados.length) {
+        vacio.style.display = "block";
+        actualizarInfo();
+        return;
+      }
+
+      vacio.style.display = "none";
+
+      archivosFiltrados.forEach(archivo => {
+        const modelo = nombre(archivo);
+        const cantidad = pedido[modelo] || "";
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <div class="imgwrap">
+            <img src="${urlImagen(archivo)}" alt="${modelo}" loading="lazy">
+          </div>
+          <div class="modelo">${modelo}</div>
+          <div class="controls">
+            <button type="button">-</button>
+            <input type="number" min="0" inputmode="numeric" value="${cantidad}">
+            <button type="button">+</button>
+          </div>
+        `;
+
+        const botones = card.querySelectorAll("button");
+        const input = card.querySelector("input");
+
+        botones[0].addEventListener("click", () => restar(modelo, input));
+        botones[1].addEventListener("click", () => sumar(modelo, input));
+
+        input.addEventListener("change", () => cambiarCantidad(modelo, input.value));
+        input.addEventListener("input", () => cambiarCantidad(modelo, input.value));
+
+        grid.appendChild(card);
+      });
+
+      actualizarInfo();
+    }
+
+    document.getElementById("busqueda").addEventListener("input", function() {
+      const texto = this.value.trim().toLowerCase();
+      archivosFiltrados = ARCHIVOS.filter(a => nombre(a).toLowerCase().includes(texto));
+      render();
+    });
+
+    function generarCSV() {
+      const lineas = ["modelo,cantidad"];
+
+      Object.keys(pedido)
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" }))
+        .forEach(modelo => {
+          const cantidad = Number(pedido[modelo]) || 0;
+          if (cantidad > 0) {
+            lineas.push(`${modelo},${cantidad}`);
+          }
+        });
+
+      return lineas.join("\n");
+    }
+
+    function verPedido() {
+      const csv = generarCSV();
+      alert(csv);
+    }
+
+    function enviarPedido() {
+      const items = Object.keys(pedido).filter(m => Number(pedido[m]) > 0);
+
+      if (!items.length) {
+        alert("Todavía no agregaste ningún modelo.");
+        return;
+      }
+
+      const totalCantidad = items.reduce((acc, modelo) => acc + (Number(pedido[modelo]) || 0), 0);
+
+      const mensaje = `Hola, te envío mi pedido de ${totalCantidad} calcos.`;
+      const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, "_blank");
+    }
+
+    render();
+  </script>
+</body>
+</html>
