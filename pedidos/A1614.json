@@ -1,0 +1,20 @@
+{
+  "codigo": "A1614",
+  "fecha": "2026-04-14T02:06:14.929Z",
+  "cliente": "a",
+  "localidad": "a",
+  "telefono": "234",
+  "material": "Blanco",
+  "medida": "8cm",
+  "totalCantidad": 50,
+  "precioUnitario": 412,
+  "precioTotal": 20600,
+  "nombreArchivoCSV": "A1614_a_a_234_Blanco_8cm.csv",
+  "items": [
+    {
+      "modelo": "6780",
+      "cantidad": 50
+    }
+  ],
+  "csv": "modelo,cantidad\n6780,50"
+}

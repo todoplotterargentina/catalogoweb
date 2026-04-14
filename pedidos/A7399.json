@@ -1,0 +1,20 @@
+{
+  "codigo": "A7399",
+  "fecha": "2026-04-14T01:57:42.946Z",
+  "cliente": "55",
+  "localidad": "ESQUINA",
+  "telefono": "5454545",
+  "material": "Blanco",
+  "medida": "8cm",
+  "totalCantidad": 80,
+  "precioUnitario": 340,
+  "precioTotal": 27200,
+  "nombreArchivoCSV": "A7399_55_ESQUINA_5454545_Blanco_8cm.csv",
+  "items": [
+    {
+      "modelo": "3376",
+      "cantidad": 80
+    }
+  ],
+  "csv": "modelo,cantidad\n3376,80"
+}

@@ -1,0 +1,24 @@
+{
+  "codigo": "A3860",
+  "fecha": "2026-04-14T01:45:39.560Z",
+  "cliente": "pepe",
+  "localidad": "iu9889",
+  "telefono": "9898",
+  "material": "Blanco",
+  "medida": "8cm",
+  "totalCantidad": 130,
+  "precioUnitario": 308,
+  "precioTotal": 40040,
+  "nombreArchivoCSV": "A3860_pepe_iu9889_9898_Blanco_8cm.csv",
+  "items": [
+    {
+      "modelo": "3",
+      "cantidad": 8
+    },
+    {
+      "modelo": "4",
+      "cantidad": 122
+    }
+  ],
+  "csv": "modelo,cantidad\n3,8\n4,122"
+}
