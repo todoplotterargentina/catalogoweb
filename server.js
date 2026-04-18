@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy", "frame-ancestors *");
+  res.removeHeader("X-Frame-Options");
   next();
 });
 
