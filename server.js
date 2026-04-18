@@ -5,6 +5,11 @@ const fs = require("fs");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "frame-ancestors *");
+  next();
+});
+
 const publicPath = path.join(__dirname, "public");
 const pedidosPath = path.join(__dirname, "pedidos");
 
