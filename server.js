@@ -115,7 +115,6 @@ app.post("/api/pedidos", (req, res) => {
   try {
     const {
       cliente,
-      localidad,
       telefono,
       material,
       medida,
@@ -126,7 +125,6 @@ app.post("/api/pedidos", (req, res) => {
     } = req.body || {};
 
     const clienteLimpio = limpiarTexto(cliente);
-    const localidadLimpia = limpiarTexto(localidad);
     const telefonoLimpio = limpiarTexto(telefono);
     const materialLimpio = limpiarTexto(material);
     const medidaLimpia = limpiarTexto(medida);
@@ -137,10 +135,6 @@ app.post("/api/pedidos", (req, res) => {
 
     if (!clienteLimpio) {
       return res.status(400).json({ ok: false, error: "Falta el nombre del cliente." });
-    }
-
-    if (!localidadLimpia) {
-      return res.status(400).json({ ok: false, error: "Falta la localidad." });
     }
 
     if (!telefonoLimpio) {
@@ -186,7 +180,6 @@ app.post("/api/pedidos", (req, res) => {
     const nombreArchivoCSV = [
       codigo,
       sanitizarParaArchivo(clienteLimpio),
-      sanitizarParaArchivo(localidadLimpia),
       sanitizarParaArchivo(telefonoLimpio),
       sanitizarParaArchivo(materialLimpio),
       sanitizarParaArchivo(medidaLimpia)
@@ -196,7 +189,6 @@ app.post("/api/pedidos", (req, res) => {
       codigo,
       fecha,
       cliente: clienteLimpio,
-      localidad: localidadLimpia,
       telefono: telefonoLimpio,
       material: materialLimpio,
       medida: medidaLimpia,
@@ -248,7 +240,6 @@ app.get("/api/pedidos", basicAuth, (req, res) => {
           codigo: pedido.codigo,
           fecha: pedido.fecha,
           cliente: pedido.cliente,
-          localidad: pedido.localidad,
           telefono: pedido.telefono,
           material: pedido.material,
           medida: pedido.medida,
