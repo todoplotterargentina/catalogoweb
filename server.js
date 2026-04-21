@@ -15,7 +15,7 @@ const publicPath = path.join(__dirname, "public");
 const pedidosPath = path.join(__dirname, "pedidos");
 
 const ADMIN_USER = process.env.ADMIN_USER || "admin";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "cambiar-esta-clave";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "cambiar-esta-clave2105";
 
 if (!fs.existsSync(pedidosPath)) {
   fs.mkdirSync(pedidosPath, { recursive: true });
