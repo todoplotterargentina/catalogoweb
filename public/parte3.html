@@ -287,7 +287,6 @@
       <a href="index.html">Inicio</a>
       <a href="parte1.html">Catálogo 1</a>
       <a href="parte2.html">Catálogo 2</a>
-
       <input id="cliente" class="mini" placeholder="Nombre" />
       <input id="telefono" class="mini" placeholder="Teléfono" />
 
@@ -325,7 +324,7 @@
   </div>
 
   <script>
-    const CLOUDINARY_BASE = "https://res.cloudinary.com/da2c6wb9n/image/upload/";
+    const CLOUDINARY_BASE = "https://catalogotodoplotter.b-cdn.net/";
     const STORAGE_KEY = "pedido_catalogo";
     const OLD_KEYS = ["pedido_catalogo", "pedido", "carrito", "pedido_calcos"];
 
@@ -381,11 +380,15 @@
     };
 
     function nombre(archivo) {
-      return archivo.split("_")[0];
+      return String(archivo).replace(/\.(jpg|jpeg|png|webp)$/i, "").split("_")[0];
     }
 
     function urlImagen(archivo) {
-      return CLOUDINARY_BASE + archivo;
+      const archivoFinal = /\.(jpg|jpeg|png|webp)$/i.test(String(archivo))
+        ? String(archivo)
+        : String(archivo) + ".jpg";
+
+      return CLOUDINARY_BASE + archivoFinal;
     }
 
     function cargarPedido() {
