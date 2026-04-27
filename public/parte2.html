@@ -1,708 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catálogo 2</title>
-  <script src="archivos2.js"></script>
-  <style>
-    * { box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo 2</title>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: white;
-      padding: 6px 8px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .topbar {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    #busqueda {
-      width: 120px;
-      flex: 0 0 120px;
-      padding: 6px 8px;
-      font-size: 13px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .topbar a {
-      padding: 8px 12px;
-      font-size: 14px;
-      border: none;
-      background: #111;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      display: inline-block;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    .topbar .mini {
-      height: 38px;
-      padding: 6px 8px;
-      font-size: 13px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background: white;
-      color: #111;
-    }
-
-    #cliente {
-      width: 90px;
-    }
-
-    #telefono {
-      width: 130px;
-    }
-
-    #material {
-      width: 140px;
-    }
-
-    #medida {
-      width: 95px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-      gap: 10px;
-      padding: 10px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-      padding-bottom: 6px;
-    }
-
-    .imgwrap {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .imgwrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      background: white;
-    }
-
-    .modelo {
-      text-align: center;
-      font-weight: bold;
-      font-size: 16px;
-      margin: 6px 0 4px;
-    }
-
-    .controls {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .controls button {
-      width: 30px;
-      height: 30px;
-      border: none;
-      border-radius: 6px;
-      background: #111;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      line-height: 1;
-    }
-
-    .controls input {
-      width: 52px;
-      height: 30px;
-      text-align: center;
-      font-size: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    .acciones {
-      position: sticky;
-      bottom: 0;
-      background: white;
-      border-top: 1px solid #ddd;
-      padding: 5px 8px;
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      z-index: 1000;
-      align-items: center;
-    }
-
-    .acciones button {
-      flex: 0 0 auto;
-      padding: 9px 12px;
-      font-size: 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: center;
-      background: #111;
-      color: white;
-      white-space: nowrap;
-    }
-
-    .acciones .danger {
-      background: #b00020;
-    }
-
-    .acciones .loading {
-      background: #444;
-      cursor: wait;
-    }
-
-    .resumen {
-      flex: 1 1 420px;
-      min-width: 260px;
-      background: #f8f8f8;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 13px;
-      line-height: 1.25;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 12px;
-      align-items: center;
-    }
-
-    .alerta-minimo {
-      color: #b00020;
-      font-weight: bold;
-      width: 100%;
-    }
-
-    .acciones-botones {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-      flex: 0 0 auto;
-    }
-
-    .vacio {
-      text-align: center;
-      padding: 30px 15px;
-      color: #777;
-    }
-
-    @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      }
-
-      .topbar {
-        gap: 5px;
-      }
-
-      #busqueda,
-      #cliente,
-      #telefono,
-      #material,
-      #medida {
-        width: auto;
-        flex: 1 1 120px;
-      }
-
-      .resumen {
-        gap: 4px 10px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .topbar {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-      }
-
-      #busqueda,
-      #cliente,
-      #telefono,
-      #material,
-      #medida {
-        width: 100%;
-      }
-
-      .topbar a {
-        text-align: center;
-      }
-
-      .acciones {
-        padding: 4px 6px;
-        gap: 6px;
-      }
-
-      .resumen {
-        min-width: 100%;
-        font-size: 12px;
-        padding: 5px 8px;
-      }
-
-      .acciones-botones {
-        width: 100%;
-      }
-
-      .acciones-botones button {
-        flex: 1 1 160px;
-      }
-    }
-  </style>
+<style>
+body { font-family: Arial; margin:0; }
+#catalogo {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:10px;
+  padding:10px;
+}
+.card {
+  border:1px solid #ddd;
+  padding:5px;
+  text-align:center;
+}
+img { width:100%; }
+.controles { display:flex; justify-content:center; gap:5px; }
+button { padding:5px 10px; }
+</style>
 </head>
+
 <body>
 
-  <header>
-    <div class="topbar">
-      <input type="text" id="busqueda" placeholder="Buscar modelo" />
+<h2 style="text-align:center;">Catálogo 2</h2>
 
-      <a href="index.html">Inicio</a>
-      <a href="parte1.html">Catálogo 1</a>
-      <a href="parte3.html">Catálogo 3</a>
+<div id="catalogo"></div>
 
-      <input id="cliente" class="mini" placeholder="Nombre" />
-      <input id="telefono" class="mini" placeholder="Teléfono" />
+<button onclick="descargarCSV()" style="position:fixed;bottom:10px;right:10px;">
+Enviar pedido
+</button>
 
-      <select id="material" class="mini">
-        <option value="">Material</option>
-        <option value="Blanco">Blanco</option>
-        <option value="Tornasolado">Tornasolado / Holográfico</option>
-      </select>
+<script src="archivos2.js"></script>
 
-      <select id="medida" class="mini">
-        <option value="">Medida</option>
-        <option value="6cm">6 cm</option>
-        <option value="8cm">8 cm</option>
-        <option value="10cm">10 cm</option>
-      </select>
+<script>
+const BASE_URL = "https://catalogotodoplotter.b-cdn.net/";
+
+let pedido = {};
+
+function urlImagen(archivo){
+  return BASE_URL + archivo + ".jpg";
+}
+
+function crearCard(archivo){
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `
+    <img src="${urlImagen(archivo)}" loading="lazy">
+    <p>${archivo}</p>
+    <div class="controles">
+      <button onclick="menos('${archivo}')">-</button>
+      <input id="i_${archivo}" type="number" value="0" min="0" style="width:50px">
+      <button onclick="mas('${archivo}')">+</button>
     </div>
-  </header>
+  `;
 
-  <main>
-    <div class="grid" id="grid"></div>
-    <div class="vacio" id="vacio" style="display:none;">No se encontraron modelos.</div>
-  </main>
+  return div;
+}
 
-  <div class="acciones">
-    <div class="resumen" id="resumenPrecio">
-      <div><strong>Total de calcos:</strong> 0</div>
-      <div><strong>Precio total:</strong> -</div>
-      <div class="alerta-minimo" id="alertaMinimo"></div>
-    </div>
+function cargar(){
+  ARCHIVOS.forEach(a=>{
+    catalogo.appendChild(crearCard(a));
+  });
+}
 
-    <div class="acciones-botones">
-      <button class="danger" onclick="limpiarPedido()">Limpiar pedido</button>
-      <button id="btnEnviar" onclick="enviarPedido()">Enviar pedido</button>
-    </div>
-  </div>
+function mas(a){
+  let v = parseInt(document.getElementById("i_"+a).value)||0;
+  v++;
+  document.getElementById("i_"+a).value = v;
+  pedido[a]=v;
+}
 
-  <script>
-    const CLOUDINARY_BASE = "https://res.cloudinary.com/da2c6wb9n/image/upload/";
-    const STORAGE_KEY = "pedido_catalogo";
-    const OLD_KEYS = ["pedido_catalogo", "pedido", "carrito", "pedido_calcos"];
+function menos(a){
+  let v = parseInt(document.getElementById("i_"+a).value)||0;
+  if(v>0)v--;
+  document.getElementById("i_"+a).value = v;
 
-    const PRECIOS = {
-      Blanco: {
-        "10cm": [
-          { min: 50, max: 79, precio: 458 },
-          { min: 80, max: 129, precio: 378 },
-          { min: 130, max: 249, precio: 342 },
-          { min: 250, max: 449, precio: 257 },
-          { min: 450, max: 649, precio: 219 },
-          { min: 650, max: Infinity, precio: 197 }
-        ],
-        "8cm": [
-          { min: 50, max: 79, precio: 412 },
-          { min: 80, max: 129, precio: 340 },
-          { min: 130, max: 249, precio: 308 },
-          { min: 250, max: 449, precio: 230 },
-          { min: 450, max: 649, precio: 197 },
-          { min: 650, max: Infinity, precio: 177 }
-        ],
-        "6cm": [
-          { min: 130, max: 249, precio: 246 },
-          { min: 250, max: 449, precio: 185 },
-          { min: 450, max: 649, precio: 158 },
-          { min: 650, max: Infinity, precio: 142 }
-        ]
-      },
-      Tornasolado: {
-        "10cm": [
-          { min: 50, max: 79, precio: 755 },
-          { min: 80, max: 129, precio: 623 },
-          { min: 130, max: 249, precio: 563 },
-          { min: 250, max: 449, precio: 423 },
-          { min: 450, max: 649, precio: 362 },
-          { min: 650, max: Infinity, precio: 325 }
-        ],
-        "8cm": [
-          { min: 50, max: 79, precio: 680 },
-          { min: 80, max: 129, precio: 561 },
-          { min: 130, max: 249, precio: 506 },
-          { min: 250, max: 449, precio: 384 },
-          { min: 450, max: 649, precio: 325 },
-          { min: 650, max: Infinity, precio: 292 }
-        ],
-        "6cm": [
-          { min: 130, max: 249, precio: 406 },
-          { min: 250, max: 449, precio: 307 },
-          { min: 450, max: 649, precio: 260 },
-          { min: 650, max: Infinity, precio: 234 }
-        ]
-      }
-    };
+  if(v===0) delete pedido[a];
+  else pedido[a]=v;
+}
 
-    function nombre(archivo) {
-      return archivo.split("_")[0];
+function descargarCSV(){
+  let lineas = ["modelo,cantidad"];
+
+  Object.keys(pedido).forEach(a=>{
+    let cant = pedido[a];
+
+    while(cant>0){
+      let t = cant>=9?9:cant;
+      lineas.push(a+","+t);
+      cant-=t;
     }
-
-    function urlImagen(archivo) {
-      return CLOUDINARY_BASE + archivo;
-    }
-
-    function cargarPedido() {
-      for (const key of OLD_KEYS) {
-        try {
-          const data = JSON.parse(localStorage.getItem(key));
-          if (data && typeof data === "object") {
-            return data;
-          }
-        } catch {}
-      }
-      return {};
-    }
-
-    function guardarPedido(pedidoActual) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(pedidoActual));
-    }
-
-    function formatoPesos(valor) {
-      return "$" + valor.toLocaleString("es-AR");
-    }
-
-    function obtenerTotalCantidad() {
-      return Object.values(pedido).reduce((acc, val) => acc + (Number(val) || 0), 0);
-    }
-
-    function obtenerMinimoActual(medida) {
-      if (medida === "6cm") return 130;
-      return 50;
-    }
-
-    function obtenerPrecioUnitario(material, medida, cantidad) {
-      if (!material || !medida || !cantidad) return null;
-
-      const tablaMaterial = PRECIOS[material];
-      if (!tablaMaterial) return null;
-
-      const tablaMedida = tablaMaterial[medida];
-      if (!tablaMedida) return null;
-
-      const tramo = tablaMedida.find(item => cantidad >= item.min && cantidad <= item.max);
-      return tramo ? tramo.precio : null;
-    }
-
-    function obtenerItemsPedido() {
-      return Object.keys(pedido)
-        .filter(modelo => Number(pedido[modelo]) > 0)
-        .map(modelo => ({
-          modelo,
-          cantidad: Number(pedido[modelo]) || 0
-        }));
-    }
-
-    let pedido = cargarPedido();
-    let archivosFiltrados = [...ARCHIVOS];
-
-    function actualizarResumenPrecio() {
-      const material = document.getElementById("material").value;
-      const medida = document.getElementById("medida").value;
-      const totalCantidad = obtenerTotalCantidad();
-      const minimo = obtenerMinimoActual(medida);
-      const precioUnitario = obtenerPrecioUnitario(material, medida, totalCantidad);
-
-      const resumen = document.getElementById("resumenPrecio");
-
-      let precioTotalTexto = "-";
-
-      if (precioUnitario && totalCantidad > 0) {
-        precioTotalTexto = formatoPesos(precioUnitario * totalCantidad);
-      }
-
-      resumen.innerHTML = `
-        <div><strong>Total de calcos:</strong> ${totalCantidad}</div>
-        <div><strong>Precio total:</strong> ${precioTotalTexto}</div>
-        <div class="alerta-minimo" id="alertaMinimo"></div>
-      `;
-
-      const alertaNueva = document.getElementById("alertaMinimo");
-
-      if (!medida) {
-        alertaNueva.textContent = "";
-      } else if (totalCantidad > 0 && totalCantidad < minimo) {
-        alertaNueva.textContent = `Mínimo para ${medida}: ${minimo} calcos.`;
-      } else {
-        alertaNueva.textContent = "";
-      }
-    }
-
-    function cambiarCantidad(modelo, valor) {
-      valor = Number(valor) || 0;
-
-      if (valor <= 0) {
-        delete pedido[modelo];
-      } else {
-        pedido[modelo] = valor;
-      }
-
-      guardarPedido(pedido);
-      actualizarResumenPrecio();
-    }
-
-    function sumar(modelo, input) {
-      input.value = Number(input.value || 0) + 1;
-      cambiarCantidad(modelo, input.value);
-    }
-
-    function restar(modelo, input) {
-      let actual = Number(input.value || 0);
-      actual = Math.max(0, actual - 1);
-      input.value = actual;
-      cambiarCantidad(modelo, actual);
-    }
-
-    function render() {
-      const grid = document.getElementById("grid");
-      const vacio = document.getElementById("vacio");
-
-      grid.innerHTML = "";
-
-      if (!archivosFiltrados.length) {
-        vacio.style.display = "block";
-        actualizarResumenPrecio();
-        return;
-      }
-
-      vacio.style.display = "none";
-
-      archivosFiltrados.forEach(archivo => {
-        const modelo = nombre(archivo);
-        const cantidad = pedido[modelo] || "";
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-          <div class="imgwrap">
-            <img src="${urlImagen(archivo)}" alt="${modelo}" loading="lazy">
-          </div>
-          <div class="modelo">${modelo}</div>
-          <div class="controls">
-            <button type="button">-</button>
-            <input type="number" min="0" inputmode="numeric" value="${cantidad}">
-            <button type="button">+</button>
-          </div>
-        `;
-
-        const botones = card.querySelectorAll("button");
-        const input = card.querySelector("input");
-
-        botones[0].addEventListener("click", () => restar(modelo, input));
-        botones[1].addEventListener("click", () => sumar(modelo, input));
-
-        input.addEventListener("change", () => cambiarCantidad(modelo, input.value));
-        input.addEventListener("input", () => cambiarCantidad(modelo, input.value));
-
-        grid.appendChild(card);
-      });
-
-      actualizarResumenPrecio();
-    }
-
-    function refrescarPedidoDesdeStorage() {
-      pedido = cargarPedido();
-
-      const texto = document.getElementById("busqueda").value.trim().toLowerCase();
-      archivosFiltrados = ARCHIVOS.filter(a => nombre(a).toLowerCase().includes(texto));
-
-      render();
-    }
-
-    function limpiarPedido() {
-      const confirmar = confirm("¿Querés borrar todo el pedido?");
-      if (!confirmar) return;
-
-      for (const key of OLD_KEYS) {
-        localStorage.removeItem(key);
-      }
-
-      pedido = {};
-      render();
-      alert("El pedido fue limpiado.");
-    }
-
-    function limpiarFormularioYCarrito() {
-      for (const key of OLD_KEYS) {
-        localStorage.removeItem(key);
-      }
-
-      pedido = {};
-
-      document.getElementById("cliente").value = "";
-      document.getElementById("telefono").value = "";
-      document.getElementById("material").value = "";
-      document.getElementById("medida").value = "";
-
-      archivosFiltrados = [...ARCHIVOS];
-      document.getElementById("busqueda").value = "";
-
-      render();
-    }
-
-    function setEstadoBotonEnviando(enviando) {
-      const btn = document.getElementById("btnEnviar");
-
-      if (enviando) {
-        btn.disabled = true;
-        btn.classList.add("loading");
-        btn.textContent = "Guardando pedido...";
-      } else {
-        btn.disabled = false;
-        btn.classList.remove("loading");
-        btn.textContent = "Enviar pedido";
-      }
-    }
-
-    document.getElementById("busqueda").addEventListener("input", function() {
-      const texto = this.value.trim().toLowerCase();
-      archivosFiltrados = ARCHIVOS.filter(a => nombre(a).toLowerCase().includes(texto));
-      render();
-    });
-
-    document.getElementById("material").addEventListener("change", actualizarResumenPrecio);
-    document.getElementById("medida").addEventListener("change", actualizarResumenPrecio);
-
-    async function enviarPedido() {
-      const cliente = document.getElementById("cliente").value.trim();
-      const telefono = document.getElementById("telefono").value.trim();
-      const material = document.getElementById("material").value;
-      const medida = document.getElementById("medida").value;
-
-      const items = obtenerItemsPedido();
-      const totalCantidad = obtenerTotalCantidad();
-      const minimo = obtenerMinimoActual(medida);
-      const precioUnitario = obtenerPrecioUnitario(material, medida, totalCantidad);
-      const precioTotal = precioUnitario ? precioUnitario * totalCantidad : 0;
-
-      let errores = [];
-
-      if (!items.length) {
-        errores.push("Agregá al menos un modelo al pedido.");
-      }
-
-      if (!cliente) {
-        errores.push("Ingresá tu nombre.");
-      }
-
-      if (!telefono) {
-        errores.push("Ingresá tu teléfono.");
-      }
-
-      if (!material) {
-        errores.push("Seleccioná un material.");
-      }
-
-      if (!medida) {
-        errores.push("Seleccioná una medida.");
-      }
-
-      if (medida && totalCantidad > 0 && totalCantidad < minimo) {
-        errores.push(`El mínimo para ${medida} es de ${minimo} calcos.`);
-      }
-
-      if (material && medida && totalCantidad >= minimo && !precioUnitario) {
-        errores.push("No se pudo calcular el precio del pedido.");
-      }
-
-      if (errores.length > 0) {
-        alert(errores.join("\n"));
-        return;
-      }
-
-      const materialTexto = material === "Tornasolado" ? "Tornasolado / Holográfico" : material;
-
-      try {
-        setEstadoBotonEnviando(true);
-
-        const response = await fetch("/api/pedidos", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            cliente,
-            telefono,
-            material: materialTexto,
-            medida,
-            totalCantidad,
-            precioUnitario,
-            precioTotal,
-            items
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || !data.ok) {
-          throw new Error(data.error || "No se pudo guardar el pedido.");
-        }
-
-        alert(`Pedido guardado correctamente. Tu código es ${data.codigo}.`);
-
-        limpiarFormularioYCarrito();
-
-        const url = `https://wa.me/?text=${encodeURIComponent(data.whatsappMessage)}`;
-        window.open(url, "_blank");
-      } catch (error) {
-        alert(error.message || "Ocurrió un error al guardar el pedido.");
-      } finally {
-        setEstadoBotonEnviando(false);
-      }
-    }
-
-    window.addEventListener("pageshow", refrescarPedidoDesdeStorage);
-    window.addEventListener("storage", refrescarPedidoDesdeStorage);
-
-    pedido = cargarPedido();
-    render();
-  </script>
+  });
+
+  let blob = new Blob([lineas.join("\n")], {type:"text/csv"});
+  let url = URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "pedido.csv";
+  a.click();
+}
+
+cargar();
+</script>
 </body>
 </html>
